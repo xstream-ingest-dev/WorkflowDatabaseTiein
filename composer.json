@@ -44,14 +44,20 @@
     "description": "Contains the database backend for the Workflow component.",
     "homepage": "https://github.com/zetacomponents",
     "license": "Apache-2.0",
-    "name": "zetacomponents/workflow-database-tiein",
+    "name": "xstream/workflow-database-tiein",
     "type": "library",
         "require": {
             "zetacomponents/database": "~1.4",
-            "zetacomponents/workflow": "~1.4"
+            "xstream/workflow": "~1.4"
         },
         "require-dev": {
             "zetacomponents/unit-test": "*",
             "zetacomponents/database-schema": "*"
+        },
+    "repositories": [
+        {
+            "type" : "git",
+            "url" : "https://github.com/xstream-ingest-dev/Workflow.git"
         }
+    ]
 }
