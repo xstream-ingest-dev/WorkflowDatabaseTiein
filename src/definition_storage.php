@@ -50,16 +50,22 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
     );
 
     /**
+     * @var mixed
+     */
+    protected $container;
+
+    /**
      * Construct a new database definition handler.
      *
      * This constructor is a tie-in.
      *
      * @param ezcDbHandler $db
      */
-    public function __construct( ezcDbHandler $db )
+    public function __construct( ezcDbHandler $db, $container = null)
     {
         $this->db = $db;
         $this->properties['options'] = new ezcWorkflowDatabaseOptions;
+        $this->container = $container;
     }
 
     /**
@@ -206,6 +212,9 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
             $nodes[$node['node_id']] = new $node['node_class'](
               $configuration
             );
+            if (method_exists($nodes[$node['node_id']], 'setContainer')) {
+                $nodes[$node['node_id']]->setContainer($this->container);
+            }
 
             if ($nodes[$node['node_id']] instanceof ezcWorkflowNodeFinally &&
                 !isset( $finallyNode ) )

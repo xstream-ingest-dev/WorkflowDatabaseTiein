@@ -48,7 +48,7 @@
     "type": "library",
         "require": {
             "zetacomponents/database": "~1.4",
-            "xstream/workflow": "~1.4"
+            "xstream/workflow": "~1.6.3"
         },
         "require-dev": {
             "zetacomponents/unit-test": "*",
