@@ -174,7 +174,7 @@ class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
 
         $query->insertInto( $this->db->quoteIdentifier( $this->options['prefix'] . 'execution' ) )
               ->set( $this->db->quoteIdentifier( 'workflow_id' ), $query->bindValue( (int)$this->workflow->id ) )
-              ->set( $this->db->quoteIdentifier( 'execution_parent' ), $query->bindValue( (int)$parentId ) )
+              ->set( $this->db->quoteIdentifier( 'execution_parent' ), $query->bindValue( $parentId ) )
               ->set( $this->db->quoteIdentifier( 'execution_started' ), $query->bindValue( time() ) )
               ->set( $this->db->quoteIdentifier( 'execution_variables' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->variables ) ) )
               ->set( $this->db->quoteIdentifier( 'execution_waiting_for' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->waitingFor ) ) )
