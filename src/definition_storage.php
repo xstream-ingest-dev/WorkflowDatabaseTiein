@@ -173,8 +173,8 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
 
             if ( $result !== false && isset( $result[0] ) )
             {
-                $workflowName    = $result[0]['workflow_name'];
-                $workflowDisplayedName    = $result[0]['workflow_displayed_name'];
+                $workflowName = $result[0]['workflow_name'];
+                $workflowDisplayedName = (string) $result[0]['workflow_displayed_name'];
                 $workflowVersion = $result[0]['workflow_version'];
             }
             else
