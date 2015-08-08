@@ -152,6 +152,8 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
      */
     public function loadById( $workflowId, $workflowName = '', $workflowVersion = 0 )
     {
+        $workflowDisplayedName= '';
+
         // Query the database for the name and version of the workflow.
         if ( empty( $workflowName ) || $workflowVersion == 0 )
         {
