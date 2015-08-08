@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS workflow;
 CREATE TABLE workflow (
   workflow_id      INTEGER      UNSIGNED NOT NULL AUTO_INCREMENT,
   workflow_name    VARCHAR(255)          NOT NULL,
+  workflow_displayed_name    VARCHAR(255)          NULL,
   workflow_version INTEGER      UNSIGNED NOT NULL DEFAULT 1,
   workflow_created INTEGER               NOT NULL,
 

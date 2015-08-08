@@ -159,6 +159,7 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
 
             $query->select( $this->db->quoteIdentifier( 'workflow_name' ) )
                   ->select( $this->db->quoteIdentifier( 'workflow_version' ) )
+                  ->select( $this->db->quoteIdentifier( 'workflow_displayed_name' ) )
                   ->from( $this->db->quoteIdentifier( $this->options['prefix'] . 'workflow' ) )
                   ->where( $query->expr->eq( $this->db->quoteIdentifier( 'workflow_id' ),
                                              $query->bindValue( (int)$workflowId ) ) );
@@ -171,6 +172,7 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
             if ( $result !== false && isset( $result[0] ) )
             {
                 $workflowName    = $result[0]['workflow_name'];
+                $workflowDisplayedName    = $result[0]['workflow_displayed_name'];
                 $workflowVersion = $result[0]['workflow_version'];
             }
             else
@@ -277,6 +279,7 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
 
         // Create workflow object and add the node objects to it.
         $workflow = new ezcWorkflow( $workflowName, $startNode, $defaultEndNode, $finallyNode );
+        $workflow->displayedName = $workflowDisplayedName;
         $workflow->definitionStorage = $this;
         $workflow->id = (int)$workflowId;
         $workflow->version = (int)$workflowVersion;
@@ -384,6 +387,7 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
 
         $query->insertInto( $this->db->quoteIdentifier( $this->options['prefix'] . 'workflow' ) )
               ->set( $this->db->quoteIdentifier( 'workflow_name' ), $query->bindValue( $workflow->name ) )
+              ->set( $this->db->quoteIdentifier( 'workflow_displayed_name' ), $query->bindValue( $workflow->displayedName ) )
               ->set( $this->db->quoteIdentifier( 'workflow_version' ), $query->bindValue( (int)$workflowVersion ) )
               ->set( $this->db->quoteIdentifier( 'workflow_created' ), $query->bindValue( time() ) );
 
