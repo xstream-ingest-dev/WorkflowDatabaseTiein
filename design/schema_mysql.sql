@@ -3,6 +3,7 @@ CREATE TABLE workflow (
   workflow_id      INTEGER      UNSIGNED NOT NULL AUTO_INCREMENT,
   workflow_name    VARCHAR(255)          NOT NULL,
   workflow_displayed_name    VARCHAR(255)          NULL,
+  activated    TINYINT(1)          DEFAULT 0,
   simple_definition    VARCHAR(255)          NULL,
   workflow_version INTEGER      UNSIGNED NOT NULL DEFAULT 1,
   workflow_created INTEGER               NOT NULL,

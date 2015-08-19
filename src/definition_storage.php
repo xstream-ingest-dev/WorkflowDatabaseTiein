@@ -154,6 +154,7 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
     {
         $workflowDisplayedName= '';
         $workflowSimpleDefinition= '';
+        $workflowActivated = false;
 
         // Query the database for the name and version of the workflow.
         if ( empty( $workflowName ) || $workflowVersion == 0 )
@@ -163,6 +164,7 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
             $query->select( $this->db->quoteIdentifier( 'workflow_name' ) )
                   ->select( $this->db->quoteIdentifier( 'workflow_version' ) )
                   ->select( $this->db->quoteIdentifier( 'workflow_displayed_name' ) )
+                  ->select( $this->db->quoteIdentifier( 'activated' ) )
                   ->select( $this->db->quoteIdentifier( 'simple_definition' ) )
                   ->from( $this->db->quoteIdentifier( $this->options['prefix'] . 'workflow' ) )
                   ->where( $query->expr->eq( $this->db->quoteIdentifier( 'workflow_id' ),
@@ -177,6 +179,7 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
             {
                 $workflowName = $result[0]['workflow_name'];
                 $workflowDisplayedName = (string) $result[0]['workflow_displayed_name'];
+                $workflowActivated = boolval($result[0]['activated']);
                 $workflowSimpleDefinition = (string) $result[0]['simple_definition'];
                 $workflowVersion = $result[0]['workflow_version'];
             }
@@ -286,6 +289,7 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
         $workflow = new ezcWorkflow( $workflowName, $startNode, $defaultEndNode, $finallyNode );
         $workflow->displayedName = $workflowDisplayedName;
         $workflow->simpleDefinition = $workflowSimpleDefinition;
+        $workflow->activated = $workflowActivated;
         $workflow->definitionStorage = $this;
         $workflow->id = (int)$workflowId;
         $workflow->version = (int)$workflowVersion;
@@ -394,6 +398,7 @@ class ezcWorkflowDatabaseDefinitionStorage implements ezcWorkflowDefinitionStora
         $query->insertInto( $this->db->quoteIdentifier( $this->options['prefix'] . 'workflow' ) )
               ->set( $this->db->quoteIdentifier( 'workflow_name' ), $query->bindValue( $workflow->name ) )
               ->set( $this->db->quoteIdentifier( 'workflow_displayed_name' ), $query->bindValue( $workflow->displayedName ) )
+              ->set( $this->db->quoteIdentifier( 'activated' ), $query->bindValue( (int)$workflow->activated ) )
               ->set( $this->db->quoteIdentifier( 'simple_definition' ), $query->bindValue( $workflow->simpleDefinition ) )
               ->set( $this->db->quoteIdentifier( 'workflow_version' ), $query->bindValue( (int)$workflowVersion ) )
               ->set( $this->db->quoteIdentifier( 'workflow_created' ), $query->bindValue( time() ) );
