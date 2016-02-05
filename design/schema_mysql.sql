@@ -52,6 +52,8 @@ CREATE TABLE execution (
   execution_waiting_for    BLOB                 NULL,
   execution_threads        BLOB                 NULL,
   execution_next_thread_id INTEGER UNSIGNED NOT NULL,
+  `media_id` int(11) DEFAULT NULL,
+  `status` enum('ERROR') COLLATE utf8_unicode_ci DEFAULT NULL,
 
   PRIMARY KEY                  (execution_id, workflow_id),
           KEY execution_parent (execution_parent)

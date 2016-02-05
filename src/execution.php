@@ -9,9 +9,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -33,6 +33,10 @@
  */
 class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
 {
+    const EXECUTION_STATUS_FAILED = 'ERROR';
+    const EXECUTION_STATUS_FINISHED = 'SUCCESS';
+    const EXECUTION_STATUS_IN_PROGRESS = 'IN-PROGRESS';
+
     /**
      * ezcDbHandler instance to be used.
      *
@@ -53,9 +57,9 @@ class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
      * @var array(string=>mixed)
      */
     protected $properties = array(
-      'definitionStorage' => null,
-      'workflow' => null,
-      'options' => null
+        'definitionStorage' => null,
+        'workflow' => null,
+        'options' => null
     );
 
     /**
@@ -173,13 +177,13 @@ class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
         $query = $this->db->createInsertQuery();
 
         $query->insertInto( $this->db->quoteIdentifier( $this->options['prefix'] . 'execution' ) )
-              ->set( $this->db->quoteIdentifier( 'workflow_id' ), $query->bindValue( (int)$this->workflow->id ) )
-              ->set( $this->db->quoteIdentifier( 'execution_parent' ), $query->bindValue( $parentId ) )
-              ->set( $this->db->quoteIdentifier( 'execution_started' ), $query->bindValue( time() ) )
-              ->set( $this->db->quoteIdentifier( 'execution_variables' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->variables ) ) )
-              ->set( $this->db->quoteIdentifier( 'execution_waiting_for' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->waitingFor ) ) )
-              ->set( $this->db->quoteIdentifier( 'execution_threads' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->threads ) ) )
-              ->set( $this->db->quoteIdentifier( 'execution_next_thread_id' ), $query->bindValue( (int)$this->nextThreadId ) );
+            ->set( $this->db->quoteIdentifier( 'workflow_id' ), $query->bindValue( (int)$this->workflow->id ) )
+            ->set( $this->db->quoteIdentifier( 'execution_parent' ), $query->bindValue( $parentId ) )
+            ->set( $this->db->quoteIdentifier( 'execution_started' ), $query->bindValue( time() ) )
+            ->set( $this->db->quoteIdentifier( 'execution_variables' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->variables ) ) )
+            ->set( $this->db->quoteIdentifier( 'execution_waiting_for' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->waitingFor ) ) )
+            ->set( $this->db->quoteIdentifier( 'execution_threads' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->threads ) ) )
+            ->set( $this->db->quoteIdentifier( 'execution_next_thread_id' ), $query->bindValue( (int)$this->nextThreadId ) );
 
         $statement = $query->prepare();
         $statement->execute();
@@ -199,12 +203,13 @@ class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
         $query = $this->db->createUpdateQuery();
 
         $query->update( $this->db->quoteIdentifier( $this->options['prefix'] . 'execution' ) )
-              ->where( $query->expr->eq( $this->db->quoteIdentifier( 'execution_id' ), $query->bindValue( (int)$this->id ) ) )
-              ->set( $this->db->quoteIdentifier( 'execution_suspended' ), $query->bindValue( time() ) )
-              ->set( $this->db->quoteIdentifier( 'execution_variables' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->variables ) ) )
-              ->set( $this->db->quoteIdentifier( 'execution_waiting_for' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->waitingFor ) ) )
-              ->set( $this->db->quoteIdentifier( 'execution_threads' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->threads ) ) )
-              ->set( $this->db->quoteIdentifier( 'execution_next_thread_id' ), $query->bindValue( (int)$this->nextThreadId ) );
+            ->where( $query->expr->eq( $this->db->quoteIdentifier( 'execution_id' ), $query->bindValue( (int)$this->id ) ) )
+            ->set( $this->db->quoteIdentifier( 'execution_suspended' ), $query->bindValue( time() ) )
+            ->set( $this->db->quoteIdentifier( 'execution_variables' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->variables ) ) )
+            ->set( $this->db->quoteIdentifier( 'execution_waiting_for' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->waitingFor ) ) )
+            ->set( $this->db->quoteIdentifier( 'execution_threads' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $this->threads ) ) )
+            ->set( $this->db->quoteIdentifier( 'status' ), $query->bindValue( $this->determineStatus() ) )
+            ->set( $this->db->quoteIdentifier( 'execution_next_thread_id' ), $query->bindValue( (int)$this->nextThreadId ) );
 
         $statement = $query->prepare();
         $statement->execute();
@@ -214,11 +219,11 @@ class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
             $query = $this->db->createInsertQuery();
 
             $query->insertInto( $this->db->quoteIdentifier( $this->options['prefix'] . 'execution_state' ) )
-                  ->set( $this->db->quoteIdentifier( 'execution_id' ), $query->bindValue( (int)$this->id ) )
-                  ->set( $this->db->quoteIdentifier( 'node_id' ), $query->bindValue( (int)$node->getId() ) )
-                  ->set( $this->db->quoteIdentifier( 'node_state' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $node->getState() ) ) )
-                  ->set( $this->db->quoteIdentifier( 'node_activated_from' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $node->getActivatedFrom() ) ) )
-                  ->set( $this->db->quoteIdentifier( 'node_thread_id' ), $query->bindValue( (int)$node->getThreadId() ) );
+                ->set( $this->db->quoteIdentifier( 'execution_id' ), $query->bindValue( (int)$this->id ) )
+                ->set( $this->db->quoteIdentifier( 'node_id' ), $query->bindValue( (int)$node->getId() ) )
+                ->set( $this->db->quoteIdentifier( 'node_state' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $node->getState() ) ) )
+                ->set( $this->db->quoteIdentifier( 'node_activated_from' ), $query->bindValue( ezcWorkflowDatabaseUtil::serialize( $node->getActivatedFrom() ) ) )
+                ->set( $this->db->quoteIdentifier( 'node_thread_id' ), $query->bindValue( (int)$node->getThreadId() ) );
 
             $statement = $query->prepare();
             $statement->execute();
@@ -296,13 +301,13 @@ class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
         $query = $this->db->createSelectQuery();
 
         $query->select( $this->db->quoteIdentifier( 'workflow_id' ) )
-              ->select( $this->db->quoteIdentifier( 'execution_variables' ) )
-              ->select( $this->db->quoteIdentifier( 'execution_threads' ) )
-              ->select( $this->db->quoteIdentifier( 'execution_next_thread_id' ) )
-              ->select( $this->db->quoteIdentifier( 'execution_waiting_for' ) )
-              ->from( $this->db->quoteIdentifier( $this->options['prefix'] . 'execution' ) )
-              ->where( $query->expr->eq( $this->db->quoteIdentifier( 'execution_id' ),
-                                         $query->bindValue( (int)$executionId ) ) );
+            ->select( $this->db->quoteIdentifier( 'execution_variables' ) )
+            ->select( $this->db->quoteIdentifier( 'execution_threads' ) )
+            ->select( $this->db->quoteIdentifier( 'execution_next_thread_id' ) )
+            ->select( $this->db->quoteIdentifier( 'execution_waiting_for' ) )
+            ->from( $this->db->quoteIdentifier( $this->options['prefix'] . 'execution' ) )
+            ->where( $query->expr->eq( $this->db->quoteIdentifier( 'execution_id' ),
+                $query->bindValue( (int)$executionId ) ) );
 
         $stmt = $query->prepare();
         $stmt->execute();
@@ -312,7 +317,7 @@ class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
         if ( $result === false || empty( $result ) )
         {
             throw new ezcWorkflowExecutionException(
-              'Could not load execution state.'
+                'Could not load execution state.'
             );
         }
 
@@ -329,12 +334,12 @@ class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
         $query = $this->db->createSelectQuery();
 
         $query->select( $this->db->quoteIdentifier( 'node_id' ) )
-              ->select( $this->db->quoteIdentifier( 'node_state' ) )
-              ->select( $this->db->quoteIdentifier( 'node_activated_from' ) )
-              ->select( $this->db->quoteIdentifier( 'node_thread_id' ) )
-              ->from( $this->db->quoteIdentifier( $this->options['prefix'] . 'execution_state' ) )
-              ->where( $query->expr->eq( $this->db->quoteIdentifier( 'execution_id' ),
-                                         $query->bindValue( (int)$executionId ) ) );
+            ->select( $this->db->quoteIdentifier( 'node_state' ) )
+            ->select( $this->db->quoteIdentifier( 'node_activated_from' ) )
+            ->select( $this->db->quoteIdentifier( 'node_thread_id' ) )
+            ->from( $this->db->quoteIdentifier( $this->options['prefix'] . 'execution_state' ) )
+            ->where( $query->expr->eq( $this->db->quoteIdentifier( 'execution_id' ),
+                $query->bindValue( (int)$executionId ) ) );
 
         $stmt = $query->prepare();
         $stmt->execute();
@@ -345,13 +350,13 @@ class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
         foreach ( $result as $row )
         {
             $active[$row['node_id']] = array(
-              'activated_from' => ezcWorkflowDatabaseUtil::unserialize(
-                $row['node_activated_from']
-              ),
-              'state' => ezcWorkflowDatabaseUtil::unserialize(
-                $row['node_state'], null
-              ),
-              'thread_id' => $row['node_thread_id']
+                'activated_from' => ezcWorkflowDatabaseUtil::unserialize(
+                    $row['node_activated_from']
+                ),
+                'state' => ezcWorkflowDatabaseUtil::unserialize(
+                    $row['node_state'], null
+                ),
+                'thread_id' => $row['node_thread_id']
             );
         }
 
@@ -375,6 +380,16 @@ class ezcWorkflowDatabaseExecution extends ezcWorkflowExecution
         $this->loaded    = true;
         $this->resumed   = false;
         $this->suspended = true;
+    }
+
+    /**
+     * @return string
+     */
+    protected function determineStatus()
+    {
+        return $this->cancelled
+            ? self::EXECUTION_STATUS_FAILED
+            : ($this->ended ? self::EXECUTION_STATUS_FINISHED : self::EXECUTION_STATUS_IN_PROGRESS);
     }
 }
 ?>

@@ -87,6 +87,24 @@ return array (
            'autoIncrement' => false,
            'unsigned' => false,
         )),
+        'media_id' =>
+        ezcDbSchemaField::__set_state(array(
+           'type' => 'integer',
+           'length' => 10,
+           'notNull' => true,
+           'default' => 0,
+           'autoIncrement' => false,
+           'unsigned' => false,
+        )),
+        'status' =>
+        ezcDbSchemaField::__set_state(array(
+           'type' => 'text',
+           'length' => 255,
+           'notNull' => false,
+           'default' => NULL,
+           'autoIncrement' => false,
+           'unsigned' => false,
+        )),
       ),
        'indexes' => 
       array (
