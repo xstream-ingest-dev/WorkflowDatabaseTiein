@@ -390,10 +390,37 @@ return array (
            'autoIncrement' => false,
            'unsigned' => false,
         )),
+        'workflow_displayed_name' =>
+        ezcDbSchemaField::__set_state(array(
+           'type' => 'text',
+           'length' => 255,
+           'notNull' => false,
+           'default' => NULL,
+           'autoIncrement' => false,
+           'unsigned' => false,
+        )),
+        'simple_definition' =>
+        ezcDbSchemaField::__set_state(array(
+           'type' => 'text',
+           'length' => 255,
+           'notNull' => false,
+           'default' => NULL,
+           'autoIncrement' => false,
+           'unsigned' => false,
+        )),
         'workflow_version' => 
         ezcDbSchemaField::__set_state(array(
            'type' => 'integer',
            'length' => 10,
+           'notNull' => true,
+           'default' => 1,
+           'autoIncrement' => false,
+           'unsigned' => false,
+        )),
+        'activated' =>
+        ezcDbSchemaField::__set_state(array(
+           'type' => 'integer',
+           'length' => 1,
            'notNull' => true,
            'default' => 1,
            'autoIncrement' => false,

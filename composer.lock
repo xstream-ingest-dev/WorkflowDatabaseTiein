@@ -5,14 +5,15 @@
         "This file is @generated automatically"
     ],
     "hash": "3b460af7460f4610d08c6dc2c21255f5",
+    "content-hash": "05739f61279b16ca9b919415b8a255fe",
     "packages": [
         {
             "name": "xstream/workflow",
-            "version": "1.12.0",
+            "version": "1.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/xstream-ingest-dev/Workflow.git",
-                "reference": "579532b9183f39062fed7d26552ee6b56e30ea6b"
+                "reference": "d476a663ace00d9f1c7c18ab8b92ae9758012a8b"
             },
             "require": {
                 "zetacomponents/base": "~1.8"
@@ -63,7 +64,7 @@
             ],
             "description": "The purpose of the Workflow component is to provide the core functionality of an activity-based workflow system including the definition and execution of workflow specifications.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2015-08-19 16:41:08"
+            "time": "2016-02-05 09:50:06"
         },
         {
             "name": "zetacomponents/base",
