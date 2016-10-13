@@ -52,7 +52,8 @@
         },
         "require-dev": {
             "zetacomponents/unit-test": "*",
-            "zetacomponents/database-schema": "*"
+            "zetacomponents/database-schema": "*",
+        "phpunit/phpunit": "^4.8"
         },
     "repositories": [
         {
